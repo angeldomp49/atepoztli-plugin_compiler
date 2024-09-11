@@ -12,11 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -33,9 +29,9 @@ public class App {
 
     public static void main(String[] args) throws IOException {
 
-       App.isDebugEnabled = Arrays.asList(args).contains("--debug");
+        App.isDebugEnabled = Arrays.asList(args).contains("--debug");
 
-        if(Files.notExists(Paths.get(BUILD_CONFIG_FILE))){
+        if (Files.notExists(Paths.get(BUILD_CONFIG_FILE))) {
             throw new FileNotFoundException("There is not build configuration file named build.json at this directory");
         }
 
@@ -48,7 +44,7 @@ public class App {
 
         Path buildDirPath = Paths.get(jsonContent.optString("outputDir", BUILD_DIR));
 
-        if(Files.exists(buildDirPath)){
+        if (Files.exists(buildDirPath)) {
             deleteRecursively(buildDirPath);
         }
 
@@ -57,7 +53,7 @@ public class App {
 
         var items = jsonContent.getJSONArray(ITEMS_PROPERTY);
 
-        for(int i = 0; i < items.length(); i++){
+        for (int i = 0; i < items.length(); i++) {
             var item = (String) items.get(i);
 
             copyRecursively(currentWorkingDir, item);
@@ -66,7 +62,7 @@ public class App {
 
         Path zipDirPath = Paths.get(jsonContent.optString("zipDir", ZIP_DIR));
 
-        if(Files.exists(zipDirPath)){
+        if (Files.exists(zipDirPath)) {
             deleteRecursively(zipDirPath);
         }
 
@@ -84,12 +80,12 @@ public class App {
 
         var fullTarget = Paths.get(BUILD_DIR + File.separator + item);
 
-        if(!Files.isDirectory(fullSource)){
+        if (!Files.isDirectory(fullSource)) {
             Files.copy(fullSource, fullTarget);
             return;
         }
 
-        if(App.isDebugEnabled){
+        if (App.isDebugEnabled) {
             Files.walk(fullSource)
                     .forEach(System.out::println);
         }
@@ -99,7 +95,7 @@ public class App {
 
                     try {
 
-                        if(fullSource.toString().equals(subSourcePath.toString())){
+                        if (fullSource.toString().equals(subSourcePath.toString())) {
 
                             Files.createDirectory(fullTarget);
                             return;
@@ -109,7 +105,7 @@ public class App {
 
                         var fullSubTarget = fullTarget.resolve(relativeItem);
 
-                        if(!Files.isDirectory(subSourcePath)){
+                        if (!Files.isDirectory(subSourcePath)) {
                             Files.copy(subSourcePath, fullSubTarget);
                             return;
                         }
@@ -125,14 +121,14 @@ public class App {
 
     private static void deleteRecursively(Path path) throws IOException {
 
-        if(!Files.isDirectory(path)){
+        if (!Files.isDirectory(path)) {
             Files.delete(path);
             return;
         }
 
         Files.walk(path)
                 .forEach(subPath -> {
-                    if(subPath.toString().equals(path.toString())){
+                    if (subPath.toString().equals(path.toString())) {
                         return;
                     }
 
@@ -149,9 +145,9 @@ public class App {
 
     private static void zipRecursively(Path source, Path targetFile) throws IOException {
         var fileList =
-            Files.walk(source)
-                    .filter(subPath -> !Files.isDirectory(subPath))
-                    .toList();
+                Files.walk(source)
+                        .filter(subPath -> !Files.isDirectory(subPath))
+                        .toList();
 
         var zipOutputStream = new ZipOutputStream(new FileOutputStream(targetFile.toFile()));
 
@@ -162,11 +158,11 @@ public class App {
             try {
                 zipOutputStream.putNextEntry(zipEntry);
 
-                try(var inputStream = Files.newInputStream(filename);){
+                try (var inputStream = Files.newInputStream(filename);) {
                     byte[] buffer = new byte[1024];
                     int len;
 
-                    while((len = inputStream.read(buffer)) > 0){
+                    while ((len = inputStream.read(buffer)) > 0) {
                         zipOutputStream.write(buffer, 0, len);
                     }
 
