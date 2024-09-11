@@ -1,0 +1,7 @@
+{
+  "include": [
+    "f.txt",
+    "vendor",
+    "assets"
+  ]
+}
